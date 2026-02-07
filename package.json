@@ -1,0 +1,28 @@
+{
+  "name": "notes",
+  "version": "1.0.0",
+  "description": "��#\u0000 \u0000d\u0000a\u0000y\u0000-\u00001\u00000\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adityasrivastava19/day-10.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adityasrivastava19/day-10/issues"
+  },
+  "homepage": "https://github.com/adityasrivastava19/day-10#readme"
+}

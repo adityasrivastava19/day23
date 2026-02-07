@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Notes App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* Auth Container */
+        #auth-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        #auth-container h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Notes App Container */
+        #app-container {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info span {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            min-height: 500px;
+        }
+
+        #notes-section {
+            flex: 2;
+            padding: 30px;
+            background: #f8f9fa;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        #panel-section {
+            flex: 1;
+            padding: 30px;
+            border-left: 2px solid #e0e0e0;
+            background: white;
+        }
+
+        .note {
+            background: white;
+            padding: 16px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .note:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .note-text {
+            flex: 1;
+            color: #333;
+            font-size: 15px;
+            word-break: break-word;
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin-left: 15px;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+        }
+
+        #note-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+
+        #note-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .panel-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #c62828;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Authentication Container -->
+        <div id="auth-container">
+            <h1>🔐 Secure Notes</h1>
+            <div id="auth-alert" class="alert"></div>
+            
+            <div id="login-form">
+                <div class="form-group">
+                    <label for="login-username">Username</label>
+                    <input type="text" id="login-username" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter password">
+                </div>
+                <button class="btn btn-primary" onclick="login()">Login</button>
+                <button class="btn btn-secondary" onclick="toggleAuthForm()">Don't have an account? Sign up</button>
+            </div>
+
+            <div id="signup-form" style="display: none;">
+                <div class="form-group">
+                    <label for="signup-username">Username</label>
+                    <input type="text" id="signup-username" placeholder="Choose a username">
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password</label>
+                    <input type="password" id="signup-password" placeholder="Choose a password">
+                </div>
+                <button class="btn btn-primary" onclick="signup()">Sign Up</button>
+                <button class="btn btn-secondary" onclick="toggleAuthForm()">Already have an account? Login</button>
+            </div>
+        </div>
+
+        <!-- Notes App Container -->
+        <div id="app-container">
+            <div class="header">
+                <h1>📝 My Secure Notes</h1>
+                <div class="user-info">
+                    <span id="username-display"></span>
+                    <button class="btn-logout" onclick="logout()">Logout</button>
+                </div>
+            </div>
+            
+            <div class="main-content">
+                <div id="notes-section">
+                    <div class="empty-state">
+                        <h3>No notes yet</h3>
+                        <p>Start by adding your first note!</p>
+                    </div>
+                </div>
+                
+                <div id="panel-section">
+                    <h3>Add New Note</h3>
+                    <div id="notes-alert" class="alert"></div>
+                    <textarea id="note-input" placeholder="Write your note here..."></textarea>
+                    <button class="btn btn-primary" onclick="addNote()">Add Note</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:3000';
+        
+        // DOM Elements
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const notesSection = document.getElementById('notes-section');
+        const noteInput = document.getElementById('note-input');
+        const usernameDisplay = document.getElementById('username-display');
+        const authAlert = document.getElementById('auth-alert');
+        const notesAlert = document.getElementById('notes-alert');
+
+        // Check if user is logged in on page load
+        window.onload = function() {
+            const token = localStorage.getItem('token');
+            const username = localStorage.getItem('username');
+            
+            if (token && username) {
+                showApp(username);
+                loadNotes();
+            }
+        };
+
+        // Toggle between login and signup forms
+        function toggleAuthForm() {
+            loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+            signupForm.style.display = signupForm.style.display === 'none' ? 'block' : 'none';
+            hideAlert(authAlert);
+        }
+
+        // Show alert message
+        function showAlert(element, message, type) {
+            element.textContent = message;
+            element.className = `alert alert-${type}`;
+            element.style.display = 'block';
+            setTimeout(() => hideAlert(element), 5000);
+        }
+
+        function hideAlert(element) {
+            element.style.display = 'none';
+        }
+
+        // Signup function
+        async function signup() {
+            const username = document.getElementById('signup-username').value.trim();
+            const password = document.getElementById('signup-password').value.trim();
+
+            if (!username || !password) {
+                showAlert(authAlert, 'Please enter both username and password', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API}/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert(authAlert, 'Signup successful! Please login.', 'success');
+                    setTimeout(() => {
+                        toggleAuthForm();
+                        document.getElementById('login-username').value = username;
+                    }, 1500);
+                } else {
+                    showAlert(authAlert, data.message || 'Signup failed', 'error');
+                }
+            } catch (error) {
+                showAlert(authAlert, 'Could not connect to server', 'error');
+            }
+        }
+
+        // Login function
+        async function login() {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            if (!username || !password) {
+                showAlert(authAlert, 'Please enter both username and password', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.token) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('username', username);
+                    showApp(username);
+                    loadNotes();
+                } else {
+                    showAlert(authAlert, data.message || 'Login failed', 'error');
+                }
+            } catch (error) {
+                showAlert(authAlert, 'Could not connect to server', 'error');
+            }
+        }
+
+        // Show app and hide auth
+        function showApp(username) {
+            authContainer.style.display = 'none';
+            appContainer.style.display = 'block';
+            usernameDisplay.textContent = `👤 ${username}`;
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            authContainer.style.display = 'block';
+            appContainer.style.display = 'none';
+            notesSection.innerHTML = '<div class="empty-state"><h3>No notes yet</h3><p>Start by adding your first note!</p></div>';
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            document.getElementById('signup-username').value = '';
+            document.getElementById('signup-password').value = '';
+        }
+
+        // Get authorization header
+        function getAuthHeader() {
+            const token = localStorage.getItem('token');
+            return {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+        }
+
+        // Handle unauthorized responses
+        function handleUnauthorized() {
+            showAlert(notesAlert, 'Session expired. Please login again.', 'error');
+            setTimeout(() => logout(), 2000);
+        }
+
+        // Load notes
+        async function loadNotes() {
+            try {
+                const response = await fetch(`${API}/notes`, {
+                    headers: getAuthHeader()
+                });
+
+                if (response.status === 401) {
+                    handleUnauthorized();
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Failed to load notes');
+                }
+
+                const notes = await response.json();
+                renderNotes(notes);
+            } catch (error) {
+                showAlert(notesAlert, 'Could not load notes', 'error');
+            }
+        }
+
+        // Render notes
+        function renderNotes(notes) {
+            if (notes.length === 0) {
+                notesSection.innerHTML = '<div class="empty-state"><h3>No notes yet</h3><p>Start by adding your first note!</p></div>';
+                return;
+            }
+
+            notesSection.innerHTML = '';
+            notes.forEach(note => {
+                const noteDiv = document.createElement('div');
+                noteDiv.className = 'note';
+
+                const noteText = document.createElement('span');
+                noteText.className = 'note-text';
+                noteText.textContent = note.text;
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = '🗑 Delete';
+                deleteBtn.onclick = () => deleteNote(note.id);
+
+                noteDiv.appendChild(noteText);
+                noteDiv.appendChild(deleteBtn);
+                notesSection.appendChild(noteDiv);
+            });
+        }
+
+        // Add note
+        async function addNote() {
+            const text = noteInput.value.trim();
+
+            if (!text) {
+                showAlert(notesAlert, 'Please enter a note', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API}/notes`, {
+                    method: 'POST',
+                    headers: getAuthHeader(),
+                    body: JSON.stringify({ text })
+                });
+
+                if (response.status === 401) {
+                    handleUnauthorized();
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Failed to add note');
+                }
+
+                noteInput.value = '';
+                showAlert(notesAlert, 'Note added successfully!', 'success');
+                loadNotes();
+            } catch (error) {
+                showAlert(notesAlert, 'Failed to add note', 'error');
+            }
+        }
+
+        // Delete note
+        async function deleteNote(id) {
+            try {
+                const response = await fetch(`${API}/notes/${id}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeader()
+                });
+
+                if (response.status === 401) {
+                    handleUnauthorized();
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete note');
+                }
+
+                showAlert(notesAlert, 'Note deleted successfully!', 'success');
+                loadNotes();
+            } catch (error) {
+                showAlert(notesAlert, 'Failed to delete note', 'error');
+            }
+        }
+
+        // Add note on Enter key
+        noteInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                addNote();
+            }
+        });
+
+        // Auth form Enter key support
+        document.getElementById('login-password').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') login();
+        });
+
+        document.getElementById('signup-password').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') signup();
+        });
+    </script>
+</body>
+
+</html>
